@@ -11,6 +11,7 @@ import { SpaceBubble } from './components/SpaceBubble';
 import { WhatWouldYouDo } from './components/WhatWouldYouDo';
 import { PermissionRequest } from './components/PermissionRequest';
 import { ParentSettings } from './components/ParentSettings';
+import { LanguageProvider } from './context/LanguageContext';
 
 type Screen = 'main' | 'module1' | 'module2' | 'module3' | 
   'circles' | 'safecontact' | 'privatePublic' | 'scenarioQuiz' | 'safetyScenarios' | 'infoVault' |
@@ -52,10 +53,12 @@ export default function App() {
 
   if (showPermissions) {
     return (
-      <PermissionRequest 
-        onComplete={handlePermissionComplete}
-        onSkip={() => handlePermissionComplete(false)}
-      />
+      <LanguageProvider>
+        <PermissionRequest 
+          onComplete={handlePermissionComplete}
+          onSkip={() => handlePermissionComplete(false)}
+        />
+      </LanguageProvider>
     );
   }
 
@@ -64,7 +67,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
+    <LanguageProvider>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       {currentScreen === 'main' && (
         <MainMenu onNavigate={handleNavigate} />
       )}
@@ -147,5 +151,6 @@ export default function App() {
         <ParentSettings onBack={() => setCurrentScreen('main')} />
       )}
     </div>
+    </LanguageProvider>
   );
 }
