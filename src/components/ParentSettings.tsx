@@ -3,6 +3,7 @@ import { ArrowLeft, Volume2, VolumeX, Clock, RotateCcw, Download, Upload, Shield
 import ParentPhotoCard from './ParentPhotoCard';
 import { capturePhotoFromCamera } from '../utils/imageUtils';
 import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from '../utils/translations';
 
 interface ParentSettingsProps {
   onBack: () => void;
@@ -22,6 +23,7 @@ interface Settings {
 
 export function ParentSettings({ onBack }: ParentSettingsProps) {
   const { language, setLanguage } = useLanguage();
+  const t = useTranslation();
   const [settings, setSettings] = useState<Settings>({
     soundEnabled: true,
     voiceEnabled: false,
@@ -81,7 +83,7 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
     
     keysToRemove.forEach(key => localStorage.removeItem(key));
     setShowConfirmReset(false);
-    alert('All progress has been reset!');
+    alert(t.progressResetMsg);
   };
 
   const exportSettings = () => {
@@ -108,9 +110,9 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
             const imported = JSON.parse(event.target?.result as string);
             setSettings(imported);
             localStorage.setItem('parentSettings', JSON.stringify(imported));
-            alert('Settings imported successfully!');
+            alert(t.settingsImportedMsg);
           } catch (error) {
-            alert('Error importing settings. Please check the file format.');
+            alert(t.settingsImportErrorMsg);
           }
         };
         reader.readAsText(file);
@@ -130,18 +132,18 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-4xl font-bold text-purple-700">Parent Settings</h1>
+          <h1 className="text-4xl font-bold text-purple-700">{t.parentSettingsTitle}</h1>
           <div className="w-16" />
         </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-2xl p-2 mb-6 shadow-lg flex gap-2 overflow-x-auto">
           {[
-            { id: 'general', label: 'General', icon: Shield },
-            { id: 'guidebook', label: 'Guidebook', icon: BookOpen }, // New Tab
-            { id: 'customization', label: 'Photos', icon: Camera },
-            { id: 'accessibility', label: 'Accessibility', icon: Eye },
-            { id: 'advanced', label: 'Advanced', icon: Lock },
+            { id: 'general', label: t.tabGeneral, icon: Shield },
+            { id: 'guidebook', label: t.tabGuidebook, icon: BookOpen },
+            { id: 'customization', label: t.tabPhotos, icon: Camera },
+            { id: 'accessibility', label: t.tabAccessibility, icon: Eye },
+            { id: 'advanced', label: t.tabAdvanced, icon: Lock },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -162,7 +164,7 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
         {activeTab === 'general' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Game Settings</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.gameSettings}</h2>
               
               <div className="space-y-4">
                 {/* Language Selection */}
@@ -170,8 +172,8 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
                   <div className="flex items-center gap-4 mb-3">
                     <Globe className="w-6 h-6 text-purple-600" />
                     <div>
-                      <h3 className="font-semibold text-gray-800">Language</h3>
-                      <p className="text-sm text-gray-600">Select app language</p>
+                      <h3 className="font-semibold text-gray-800">{t.languageLabel}</h3>
+                      <p className="text-sm text-gray-600">{t.languageDesc}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
@@ -207,8 +209,8 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
                       <VolumeX className="w-6 h-6 text-gray-400" />
                     )}
                     <div>
-                      <h3 className="font-semibold text-gray-800">Sound Effects</h3>
-                      <p className="text-sm text-gray-600">Enable sound feedback in games</p>
+                      <h3 className="font-semibold text-gray-800">{t.soundEffects}</h3>
+                      <p className="text-sm text-gray-600">{t.soundEffectsDesc}</p>
                     </div>
                   </div>
                   <button
@@ -230,8 +232,8 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
                   <div className="flex items-center gap-4">
                     <Bell className={`w-6 h-6 ${settings.voiceEnabled ? 'text-blue-600' : 'text-gray-400'}`} />
                     <div>
-                      <h3 className="font-semibold text-gray-800">Voice Narration</h3>
-                      <p className="text-sm text-gray-600">Read explanations aloud</p>
+                      <h3 className="font-semibold text-gray-800">{t.voiceNarration}</h3>
+                      <p className="text-sm text-gray-600">{t.voiceNarrationDesc}</p>
                     </div>
                   </div>
                   <button
@@ -253,8 +255,8 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
                   <div className="flex items-center gap-4 mb-3">
                     <Clock className="w-6 h-6 text-gray-600" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800">Session Time Limit</h3>
-                      <p className="text-sm text-gray-600">Set maximum play time per session</p>
+                      <h3 className="font-semibold text-gray-800">{t.sessionTimeLimit}</h3>
+                      <p className="text-sm text-gray-600">{t.sessionTimeLimitDesc}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -268,7 +270,7 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
                       className="flex-1"
                     />
                     <span className="text-lg font-semibold text-purple-600 min-w-[80px]">
-                      {settings.timeLimit === 0 ? 'No Limit' : `${settings.timeLimit} min`}
+                      {settings.timeLimit === 0 ? t.noLimit : `${settings.timeLimit} min`}
                     </span>
                   </div>
                 </div>
@@ -283,35 +285,35 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <BookOpen className="w-8 h-8 text-blue-600" />
-                Parent & Teacher Guide
+                {t.parentTeacherGuide}
               </h2>
               
               <div className="space-y-6 text-gray-700">
                 <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                  <h3 className="text-xl font-bold text-blue-800 mb-2">How to use this App</h3>
-                  <p>This application is designed to help children understand relationships, boundaries, and safety through interactive games. We recommend playing <strong>together</strong> with the child to discuss the scenarios.</p>
+                  <h3 className="text-xl font-bold text-blue-800 mb-2">{t.howToUseApp}</h3>
+                  <p>{t.howToUseAppDesc}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Teaching Concepts</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{t.teachingConcepts}</h3>
                   <ul className="list-disc pl-5 space-y-2">
-                    <li><strong>Safe vs Unsafe:</strong> "Safe" means it makes you feel happy, comfortable, and respected. "Unsafe" means it makes you feel scared, confused, or hurt.</li>
-                    <li><strong>Trusted Adults:</strong> People in your "Safety Circle" (like Mom, Dad, Teacher) who you can tell anything to.</li>
-                    <li><strong>Secrets:</strong> Teach that we do not keep "bad secrets" (like someone touching you). We only keep "happy surprises" (like a birthday gift).</li>
+                    <li><strong>{t.safeVsUnsafe}</strong> {t.safeVsUnsafeDesc}</li>
+                    <li><strong>{t.trustedAdults}</strong> {t.trustedAdultsDesc}</li>
+                    <li><strong>{t.secrets}</strong> {t.secretsDesc}</li>
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Discussion Prompts</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{t.discussionPrompts}</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="font-semibold text-green-800">After a scenario:</p>
-                      <p className="italic">"Why did you choose that answer?"</p>
-                      <p className="italic">"Who would you tell if this happened to you?"</p>
+                      <p className="font-semibold text-green-800">{t.afterScenario}</p>
+                      <p className="italic">{t.whyDidYouChoose}</p>
+                      <p className="italic">{t.whoWouldYouTell}</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
-                      <p className="font-semibold text-orange-800">Reinforcement:</p>
-                      <p className="italic">"It is always okay to say NO if you feel uncomfortable."</p>
+                      <p className="font-semibold text-orange-800">{t.reinforcement}</p>
+                      <p className="italic">{t.reinforcementMsg}</p>
                     </div>
                   </div>
                 </div>
@@ -324,11 +326,11 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
         {activeTab === 'customization' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload Parent Photos</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.uploadParentPhotos}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ParentPhotoCard
                   id="mom-file-input"
-                  title="Mom's Photo"
+                  title={t.momsPhoto}
                   photo={momPhoto}
                   onSavePhoto={(base64) => { setMomPhoto(base64); localStorage.setItem('parentPhoto_mom', base64); }}
                   onClear={() => { setMomPhoto(null); localStorage.removeItem('parentPhoto_mom'); }}
@@ -349,7 +351,7 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
 
                 <ParentPhotoCard
                   id="dad-file-input"
-                  title="Dad's Photo"
+                  title={t.dadsPhoto}
                   photo={dadPhoto}
                   onSavePhoto={(base64) => { setDadPhoto(base64); localStorage.setItem('parentPhoto_dad', base64); }}
                   onClear={() => { setDadPhoto(null); localStorage.removeItem('parentPhoto_dad'); }}
@@ -376,14 +378,14 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
         {activeTab === 'accessibility' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Accessibility Options</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.accessibilityOptions}</h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-4">
                     {settings.showHints ? <Eye className="w-6 h-6 text-green-600" /> : <EyeOff className="w-6 h-6 text-gray-400" />}
                     <div>
-                      <h3 className="font-semibold text-gray-800">Show Hints</h3>
-                      <p className="text-sm text-gray-600">Display helpful hints during games</p>
+                      <h3 className="font-semibold text-gray-800">{t.showHints}</h3>
+                      <p className="text-sm text-gray-600">{t.showHintsDesc}</p>
                     </div>
                   </div>
                   <button onClick={() => saveSettings({ showHints: !settings.showHints })} className={`w-14 h-8 rounded-full transition-all ${settings.showHints ? 'bg-green-500' : 'bg-gray-300'}`}>
@@ -400,27 +402,27 @@ export function ParentSettings({ onBack }: ParentSettingsProps) {
         {activeTab === 'advanced' && (
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Advanced Options</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.advancedOptions}</h2>
               <div className="space-y-4">
                 <button onClick={exportSettings} className="w-full flex items-center justify-center gap-3 p-4 bg-blue-50 border-2 border-blue-300 rounded-xl hover:bg-blue-100 transition-all">
                   <Download className="w-5 h-5 text-blue-600" />
-                  <span className="font-semibold text-blue-700">Export Settings</span>
+                  <span className="font-semibold text-blue-700">{t.exportSettings}</span>
                 </button>
                 <button onClick={importSettings} className="w-full flex items-center justify-center gap-3 p-4 bg-green-50 border-2 border-green-300 rounded-xl hover:bg-green-100 transition-all">
                   <Upload className="w-5 h-5 text-green-600" />
-                  <span className="font-semibold text-green-700">Import Settings</span>
+                  <span className="font-semibold text-green-700">{t.importSettings}</span>
                 </button>
                 <div className="border-t pt-4">
                   <button onClick={() => setShowConfirmReset(true)} className="w-full flex items-center justify-center gap-3 p-4 bg-red-50 border-2 border-red-300 rounded-xl hover:bg-red-100 transition-all">
                     <RotateCcw className="w-5 h-5 text-red-600" />
-                    <span className="font-semibold text-red-700">Reset All Progress</span>
+                    <span className="font-semibold text-red-700">{t.resetAllProgress}</span>
                   </button>
                   {showConfirmReset && (
                     <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-xl">
-                      <p className="text-sm text-yellow-800 mb-3">Are you sure you want to reset all progress?</p>
+                      <p className="text-sm text-yellow-800 mb-3">{t.resetConfirm}</p>
                       <div className="flex gap-3">
-                        <button onClick={resetProgress} className="flex-1 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">Yes, Reset</button>
-                        <button onClick={() => setShowConfirmReset(false)} className="flex-1 py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-all">Cancel</button>
+                        <button onClick={resetProgress} className="flex-1 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">{t.yesReset}</button>
+                        <button onClick={() => setShowConfirmReset(false)} className="flex-1 py-2 px-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-all">{t.cancel}</button>
                       </div>
                     </div>
                   )}

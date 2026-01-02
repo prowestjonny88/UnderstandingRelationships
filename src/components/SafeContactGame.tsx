@@ -1,122 +1,206 @@
 import { useState } from 'react';
 import { ArrowLeft, Check, X, Star } from 'lucide-react';
 import { getCharacterImage } from '../utils/imageUtils';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from '../utils/translations';
 
 interface SafeContactGameProps {
   onBack: () => void;
 }
 
+type Language = 'en' | 'ms' | 'zh';
+
 interface Scenario {
   id: number;
-  situation: string;
-  person: string;
+  situation: Record<Language, string>;
+  person: Record<Language, string>;
   personEmoji: string;
   circleColor: string;
-  action: string;
+  action: Record<Language, string>;
   isSafe: boolean;
-  explanation: string;
+  explanation: Record<Language, string>;
 }
 
 const scenarios: Scenario[] = [
   {
     id: 1,
-    situation: 'Your mom gives you a hug',
-    person: 'Mom',
+    situation: {
+      en: 'Your mom gives you a hug',
+      ms: 'Ibu anda memberi anda pelukan',
+      zh: '妈妈给你一个拥抱'
+    },
+    person: { en: 'Mom', ms: 'Ibu', zh: '妈妈' },
     personEmoji: '👩',
     circleColor: 'blue',
-    action: 'Hug',
+    action: { en: 'Hug', ms: 'Pelukan', zh: '拥抱' },
     isSafe: true,
-    explanation: 'Family hugs are safe and loving!'
+    explanation: {
+      en: 'Family hugs are safe and loving!',
+      ms: 'Pelukan keluarga adalah selamat dan penuh kasih!',
+      zh: '家人的拥抱是安全和有爱的！'
+    }
   },
   {
     id: 2,
-    situation: 'A stranger at the park tries to hold your hand',
-    person: 'Stranger',
+    situation: {
+      en: 'A stranger at the park tries to hold your hand',
+      ms: 'Orang asing di taman cuba memegang tangan anda',
+      zh: '公园里的陌生人试图牵你的手'
+    },
+    person: { en: 'Stranger', ms: 'Orang Asing', zh: '陌生人' },
     personEmoji: '🧑',
     circleColor: 'red',
-    action: 'Hold hands',
+    action: { en: 'Hold hands', ms: 'Pegang tangan', zh: '牵手' },
     isSafe: false,
-    explanation: 'Never hold hands with strangers. Say no and find a trusted adult.'
+    explanation: {
+      en: 'Never hold hands with strangers. Say no and find a trusted adult.',
+      ms: 'Jangan sekali-kali pegang tangan orang asing. Katakan tidak dan cari orang dewasa yang dipercayai.',
+      zh: '绝对不要和陌生人牵手。说不，并找一个信任的成年人。'
+    }
   },
   {
     id: 3,
-    situation: 'Your doctor checks your heartbeat',
-    person: 'Doctor',
+    situation: {
+      en: 'Your doctor checks your heartbeat',
+      ms: 'Doktor anda memeriksa degupan jantung anda',
+      zh: '医生检查你的心跳'
+    },
+    person: { en: 'Doctor', ms: 'Doktor', zh: '医生' },
     personEmoji: '👨‍⚕️',
     circleColor: 'orange',
-    action: 'Medical check',
+    action: { en: 'Medical check', ms: 'Pemeriksaan perubatan', zh: '医疗检查' },
     isSafe: true,
-    explanation: 'Doctors can check you, but a parent should be there too.'
+    explanation: {
+      en: 'Doctors can check you, but a parent should be there too.',
+      ms: 'Doktor boleh memeriksa anda, tetapi ibu bapa perlu ada bersama.',
+      zh: '医生可以检查你，但家长也应该在场。'
+    }
   },
   {
     id: 4,
-    situation: 'Someone you just met asks to tickle you',
-    person: 'New Person',
+    situation: {
+      en: 'Someone you just met asks to tickle you',
+      ms: 'Seseorang yang baru anda kenal mahu menggeletek anda',
+      zh: '刚认识的人想要挠你痒痒'
+    },
+    person: { en: 'New Person', ms: 'Orang Baru', zh: '新认识的人' },
     personEmoji: '🧔',
     circleColor: 'red',
-    action: 'Tickle',
+    action: { en: 'Tickle', ms: 'Geli-geli', zh: '挠痒痒' },
     isSafe: false,
-    explanation: 'Only family and very close friends you trust can tickle you, and only if you say yes!'
+    explanation: {
+      en: 'Only family and very close friends you trust can tickle you, and only if you say yes!',
+      ms: 'Hanya keluarga dan kawan rapat yang dipercayai boleh menggeletek anda, dan hanya jika anda berkata ya!',
+      zh: '只有你信任的家人和非常亲密的朋友才能挠你痒痒，而且只有你同意才行！'
+    }
   },
   {
     id: 5,
-    situation: 'Your teacher gives you a high-five',
-    person: 'Teacher',
+    situation: {
+      en: 'Your teacher gives you a high-five',
+      ms: 'Guru anda memberi anda high-five',
+      zh: '老师和你击掌'
+    },
+    person: { en: 'Teacher', ms: 'Guru', zh: '老师' },
     personEmoji: '👨‍🏫',
     circleColor: 'orange',
-    action: 'High-five',
+    action: { en: 'High-five', ms: 'High-five', zh: '击掌' },
     isSafe: true,
-    explanation: 'High-fives are a safe way to celebrate!'
+    explanation: {
+      en: 'High-fives are a safe way to celebrate!',
+      ms: 'High-five adalah cara selamat untuk meraikan!',
+      zh: '击掌是一种安全的庆祝方式！'
+    }
   },
   {
     id: 6,
-    situation: 'Your best friend wants to play tag',
-    person: 'Best Friend',
+    situation: {
+      en: 'Your best friend wants to play tag',
+      ms: 'Kawan baik anda mahu bermain kejar-kejar',
+      zh: '你最好的朋友想玩追逐游戏'
+    },
+    person: { en: 'Best Friend', ms: 'Kawan Baik', zh: '好朋友' },
     personEmoji: '👦',
     circleColor: 'green',
-    action: 'Tag game',
+    action: { en: 'Tag game', ms: 'Permainan kejar-kejar', zh: '追逐游戏' },
     isSafe: true,
-    explanation: 'Playing games like tag with friends is fun and safe!'
+    explanation: {
+      en: 'Playing games like tag with friends is fun and safe!',
+      ms: 'Bermain permainan seperti kejar-kejar dengan kawan adalah seronok dan selamat!',
+      zh: '和朋友玩追逐游戏既有趣又安全！'
+    }
   },
   {
     id: 7,
-    situation: 'Someone you don\'t know well asks to take a photo of you alone',
-    person: 'Acquaintance',
+    situation: {
+      en: "Someone you don't know well asks to take a photo of you alone",
+      ms: 'Seseorang yang anda tidak kenal dengan baik mahu mengambil gambar anda bersendirian',
+      zh: '不太熟悉的人想单独给你拍照'
+    },
+    person: { en: 'Acquaintance', ms: 'Kenalan', zh: '认识的人' },
     personEmoji: '👨‍💼',
     circleColor: 'yellow',
-    action: 'Take photo alone',
+    action: { en: 'Take photo alone', ms: 'Ambil gambar bersendirian', zh: '单独拍照' },
     isSafe: false,
-    explanation: 'Photos should only be taken by trusted adults or with your parent\'s permission.'
+    explanation: {
+      en: "Photos should only be taken by trusted adults or with your parent's permission.",
+      ms: 'Gambar hanya boleh diambil oleh orang dewasa yang dipercayai atau dengan izin ibu bapa anda.',
+      zh: '只有值得信赖的成年人或经过家长允许才能拍照。'
+    }
   },
   {
     id: 8,
-    situation: 'Grandpa asks for a hug goodbye',
-    person: 'Grandpa',
+    situation: {
+      en: 'Grandpa asks for a hug goodbye',
+      ms: 'Datuk minta pelukan perpisahan',
+      zh: '爷爷想要一个道别的拥抱'
+    },
+    person: { en: 'Grandpa', ms: 'Datuk', zh: '爷爷' },
     personEmoji: '👴',
     circleColor: 'blue',
-    action: 'Goodbye hug',
+    action: { en: 'Goodbye hug', ms: 'Pelukan perpisahan', zh: '道别拥抱' },
     isSafe: true,
-    explanation: 'Hugging family is safe, but you can always say if you prefer a wave or high-five!'
+    explanation: {
+      en: 'Hugging family is safe, but you can always say if you prefer a wave or high-five!',
+      ms: 'Pelukan keluarga adalah selamat, tetapi anda boleh sentiasa katakan jika anda lebih suka lambai atau high-five!',
+      zh: '拥抱家人是安全的，但如果你想挥手或击掌也可以说！'
+    }
   },
   {
     id: 9,
-    situation: 'A stranger offers you candy and asks you to get in their car',
-    person: 'Stranger',
+    situation: {
+      en: 'A stranger offers you candy and asks you to get in their car',
+      ms: 'Orang asing menawarkan gula-gula dan minta anda masuk ke kereta mereka',
+      zh: '陌生人给你糖果并让你上他们的车'
+    },
+    person: { en: 'Stranger', ms: 'Orang Asing', zh: '陌生人' },
     personEmoji: '🚗',
     circleColor: 'red',
-    action: 'Get in car',
+    action: { en: 'Get in car', ms: 'Masuk kereta', zh: '上车' },
     isSafe: false,
-    explanation: 'Never go anywhere with strangers! Find a trusted adult immediately.'
+    explanation: {
+      en: 'Never go anywhere with strangers! Find a trusted adult immediately.',
+      ms: 'Jangan sesekali pergi ke mana-mana dengan orang asing! Cari orang dewasa yang dipercayai dengan segera.',
+      zh: '永远不要和陌生人去任何地方！立即找一个值得信赖的成年人。'
+    }
   },
   {
     id: 10,
-    situation: 'Your coach helps you stretch before practice',
-    person: 'Coach',
+    situation: {
+      en: 'Your coach helps you stretch before practice',
+      ms: 'Jurulatih anda membantu anda meregangkan badan sebelum latihan',
+      zh: '教练在练习前帮助你做拉伸'
+    },
+    person: { en: 'Coach', ms: 'Jurulatih', zh: '教练' },
     personEmoji: '⚽',
     circleColor: 'orange',
-    action: 'Stretching help',
+    action: { en: 'Stretching help', ms: 'Bantuan regangan', zh: '拉伸帮助' },
     isSafe: true,
-    explanation: 'Coaches can help with sports activities in safe, public places.'
+    explanation: {
+      en: 'Coaches can help with sports activities in safe, public places.',
+      ms: 'Jurulatih boleh membantu dengan aktiviti sukan di tempat awam yang selamat.',
+      zh: '教练可以在安全的公共场所帮助进行体育活动。'
+    }
   }
 ];
 
@@ -125,6 +209,8 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [gameComplete, setGameComplete] = useState(false);
+  const { language } = useLanguage();
+  const t = useTranslation();
 
   const currentScenario = scenarios[currentIndex];
 
@@ -176,11 +262,11 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
 
   const getCircleInfo = (color: string) => {
     const circles: Record<string, { name: string, bg: string, border: string }> = {
-      blue: { name: 'Family', bg: 'bg-blue-100', border: 'border-blue-500' },
-      green: { name: 'Friends', bg: 'bg-green-100', border: 'border-green-500' },
-      yellow: { name: 'Acquaintances', bg: 'bg-yellow-100', border: 'border-yellow-500' },
-      orange: { name: 'Community Helpers', bg: 'bg-orange-100', border: 'border-orange-500' },
-      red: { name: 'Strangers', bg: 'bg-red-100', border: 'border-red-500' }
+      blue: { name: t.circleFamily, bg: 'bg-blue-100', border: 'border-blue-500' },
+      green: { name: t.circleFriends, bg: 'bg-green-100', border: 'border-green-500' },
+      yellow: { name: t.circleAcquaintances, bg: 'bg-yellow-100', border: 'border-yellow-500' },
+      orange: { name: t.circleHelpers, bg: 'bg-orange-100', border: 'border-orange-500' },
+      red: { name: t.circleStrangers, bg: 'bg-red-100', border: 'border-red-500' }
     };
     return circles[color];
   };
@@ -193,8 +279,8 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
       <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
         <div className="text-center max-w-2xl">
           <div className="text-8xl mb-6">🎉</div>
-          <h2 className="mb-4 text-purple-700">Great Job!</h2>
-          <p className="text-2xl mb-4">You scored {score} out of {scenarios.length}</p>
+          <h2 className="mb-4 text-purple-700">{t.greatJob}</h2>
+          <p className="text-2xl mb-4">{t.youGot} {score} {t.outOf} {scenarios.length}</p>
           
           <div className="flex justify-center gap-2 mb-8">
             {[1, 2, 3].map((star) => (
@@ -206,19 +292,19 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
           </div>
 
           <div className="bg-purple-50 border-4 border-purple-300 rounded-3xl p-8 mb-8">
-            <h3 className="mb-4 text-purple-700">Remember:</h3>
+            <h3 className="mb-4 text-purple-700">{t.remember}</h3>
             <ul className="text-left space-y-3">
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✅</span>
-                <span>You can always say "No" to touches that feel uncomfortable</span>
+                <span>{t.safetyReminder1}</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✅</span>
-                <span>Tell a trusted adult if someone makes you feel unsafe</span>
+                <span>{t.safetyReminder2}</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-2xl">✅</span>
-                <span>Safe touches should never be secrets</span>
+                <span>{t.safetyReminder3}</span>
               </li>
             </ul>
           </div>
@@ -232,13 +318,13 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
               }}
               className="px-8 py-4 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-all hover:scale-105"
             >
-              Play Again
+              {t.playAgain}
             </button>
             <button
               onClick={onBack}
               className="px-8 py-4 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition-all hover:scale-105"
             >
-              Back to Module
+              {t.backToModule}
             </button>
           </div>
         </div>
@@ -258,22 +344,22 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
       </button>
 
       <div className="absolute top-6 right-6 bg-white rounded-full px-6 py-3 shadow-lg z-10">
-        <span>Question {currentIndex + 1}/{scenarios.length}</span>
+        <span>{t.question} {currentIndex + 1}/{scenarios.length}</span>
       </div>
 
       <div className="max-w-3xl mx-auto pt-20">
-        <h2 className="text-center mb-8 text-purple-700">Safe Touch Game</h2>
+        <h2 className="text-center mb-8 text-purple-700">{t.safeTouchGame}</h2>
 
         <div className="bg-white rounded-3xl p-8 shadow-lg mb-8">
           <div className="text-center mb-6">
             <div className="flex justify-center mb-4">
               {(() => {
-                const imageSrc = getCharacterImage(currentScenario.person, currentScenario.personEmoji);
-                if (imageSrc && (currentScenario.person === 'Mom' || currentScenario.person === 'Dad')) {
+                const imageSrc = getCharacterImage(currentScenario.person.en, currentScenario.personEmoji);
+                if (imageSrc && (currentScenario.person.en === 'Mom' || currentScenario.person.en === 'Dad')) {
                   return (
                     <img
                       src={imageSrc}
-                      alt={currentScenario.person}
+                      alt={currentScenario.person[language]}
                       className="w-28 h-28 rounded-full object-cover border-4 border-purple-300 shadow-lg"
                       onError={(e) => {
                         const target = e.currentTarget;
@@ -293,16 +379,16 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
               })()}
             </div>
             <div className={`inline-block ${circleInfo.bg} ${circleInfo.border} border-3 rounded-2xl px-6 py-3 mb-4`}>
-              <p className="text-sm opacity-70">{circleInfo.name} Circle</p>
-              <p>{currentScenario.person}</p>
+              <p className="text-sm opacity-70">{circleInfo.name} {t.circleLabel}</p>
+              <p>{currentScenario.person[language]}</p>
             </div>
           </div>
 
           <div className="bg-blue-50 border-4 border-blue-300 rounded-2xl p-6 mb-6">
-            <p className="text-xl text-center">{currentScenario.situation}</p>
+            <p className="text-xl text-center">{currentScenario.situation[language]}</p>
           </div>
 
-          <h3 className="text-center mb-6">Is this safe?</h3>
+          <h3 className="text-center mb-6">{t.isThisSafe}</h3>
 
           <div className="grid grid-cols-2 gap-6">
             <button
@@ -314,7 +400,7 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
               `}
             >
               <Check className="w-16 h-16 mx-auto mb-3" strokeWidth={3} />
-              <p className="text-xl">Safe</p>
+              <p className="text-xl">{t.safe}</p>
             </button>
 
             <button
@@ -326,7 +412,7 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
               `}
             >
               <X className="w-16 h-16 mx-auto mb-3" strokeWidth={3} />
-              <p className="text-xl">Not Safe</p>
+              <p className="text-xl">{t.notSafe}</p>
             </button>
           </div>
         </div>
@@ -335,19 +421,19 @@ export function SafeContactGame({ onBack }: SafeContactGameProps) {
         {feedback === 'correct' && (
           <div className="bg-green-50 border-4 border-green-500 rounded-3xl p-8 text-center animate-bounce">
             <div className="text-6xl mb-4">✅</div>
-            <h3 className="text-green-700 mb-4">Correct!</h3>
-            <p className="text-xl">{currentScenario.explanation}</p>
+            <h3 className="text-green-700 mb-4">{t.correct}</h3>
+            <p className="text-xl">{currentScenario.explanation[language]}</p>
           </div>
         )}
 
         {feedback === 'incorrect' && (
           <div className="bg-orange-50 border-4 border-orange-500 rounded-3xl p-8 text-center">
             <div className="text-6xl mb-4">🤔</div>
-            <h3 className="text-orange-700 mb-4">Let's learn together!</h3>
+            <h3 className="text-orange-700 mb-4">{t.letsLearnTogether}</h3>
             <p className="text-xl mb-2">
-              This is <strong>{currentScenario.isSafe ? 'safe' : 'not safe'}</strong>.
+              {currentScenario.isSafe ? t.safe : t.notSafe}
             </p>
-            <p className="text-lg">{currentScenario.explanation}</p>
+            <p className="text-lg">{currentScenario.explanation[language]}</p>
           </div>
         )}
       </div>

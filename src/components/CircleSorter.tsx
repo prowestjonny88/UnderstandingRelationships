@@ -2,115 +2,129 @@ import { useState } from 'react';
 import { ArrowLeft, Check, Volume2, User, Users, Heart, Handshake, Shield, AlertCircle, Star, Home, RotateCcw } from 'lucide-react';
 import { Confetti } from './Confetti';
 import { getCharacterImage } from '../utils/imageUtils';
+import { useLanguage, Language } from '../context/LanguageContext';
+import { useTranslation } from '../utils/translations';
 
 interface CircleSorterProps {
   onBack: () => void;
 }
 
 interface Character {
-  name: string;
+  name: Record<Language, string>;
   correctCircle: string;
   emoji: string;
 }
 
 const characterPool: Character[] = [
-  { name: 'Mom', correctCircle: 'blue', emoji: '👩' },
-  { name: 'Dad', correctCircle: 'blue', emoji: '👨' },
-  { name: 'Grandma', correctCircle: 'blue', emoji: '👵' },
-  { name: 'Grandpa', correctCircle: 'blue', emoji: '👴' },
-  { name: 'Sister', correctCircle: 'blue', emoji: '👧' },
-  { name: 'Brother', correctCircle: 'blue', emoji: '👦' },
-  { name: 'Cousin', correctCircle: 'blue', emoji: '👧' },
+  { name: { en: 'Mom', ms: 'Ibu', zh: '妈妈' }, correctCircle: 'blue', emoji: '👩' },
+  { name: { en: 'Dad', ms: 'Ayah', zh: '爸爸' }, correctCircle: 'blue', emoji: '👨' },
+  { name: { en: 'Grandma', ms: 'Nenek', zh: '奶奶' }, correctCircle: 'blue', emoji: '👵' },
+  { name: { en: 'Grandpa', ms: 'Datuk', zh: '爷爷' }, correctCircle: 'blue', emoji: '👴' },
+  { name: { en: 'Sister', ms: 'Kakak/Adik', zh: '姐妹' }, correctCircle: 'blue', emoji: '👧' },
+  { name: { en: 'Brother', ms: 'Abang/Adik', zh: '兄弟' }, correctCircle: 'blue', emoji: '👦' },
+  { name: { en: 'Cousin', ms: 'Sepupu', zh: '表亲' }, correctCircle: 'blue', emoji: '👧' },
   
-  { name: 'Best Friend', correctCircle: 'green', emoji: '👦' },
-  { name: 'Classmate', correctCircle: 'green', emoji: '👧' },
-  { name: 'School Friend', correctCircle: 'green', emoji: '👦' },
-  { name: 'Teammate', correctCircle: 'green', emoji: '🏃' },
-  { name: 'Playground Buddy', correctCircle: 'green', emoji: '🎮' },
+  { name: { en: 'Best Friend', ms: 'Sahabat Baik', zh: '最好的朋友' }, correctCircle: 'green', emoji: '👦' },
+  { name: { en: 'Classmate', ms: 'Rakan Sekelas', zh: '同学' }, correctCircle: 'green', emoji: '👧' },
+  { name: { en: 'School Friend', ms: 'Kawan Sekolah', zh: '学校朋友' }, correctCircle: 'green', emoji: '👦' },
+  { name: { en: 'Teammate', ms: 'Rakan Sepasukan', zh: '队友' }, correctCircle: 'green', emoji: '🏃' },
+  { name: { en: 'Playground Buddy', ms: 'Kawan Taman Permainan', zh: '游乐场伙伴' }, correctCircle: 'green', emoji: '🎮' },
   
-  { name: 'Neighbor', correctCircle: 'yellow', emoji: '👨‍🦳' },
-  { name: 'Cashier', correctCircle: 'yellow', emoji: '👨‍💼' },
-  { name: 'Librarian', correctCircle: 'yellow', emoji: '👩‍💼' },
-  { name: 'Babysitter', correctCircle: 'yellow', emoji: '👩' },
-  { name: 'Bus Driver', correctCircle: 'yellow', emoji: '👨‍✈️' },
-  { name: 'Mail Carrier', correctCircle: 'yellow', emoji: '📬' },
+  { name: { en: 'Neighbor', ms: 'Jiran', zh: '邻居' }, correctCircle: 'yellow', emoji: '👨‍🦳' },
+  { name: { en: 'Cashier', ms: 'Juruwang', zh: '收银员' }, correctCircle: 'yellow', emoji: '👨‍💼' },
+  { name: { en: 'Librarian', ms: 'Pustakawan', zh: '图书管理员' }, correctCircle: 'yellow', emoji: '👩‍💼' },
+  { name: { en: 'Babysitter', ms: 'Pengasuh', zh: '保姆' }, correctCircle: 'yellow', emoji: '👩' },
+  { name: { en: 'Bus Driver', ms: 'Pemandu Bas', zh: '巴士司机' }, correctCircle: 'yellow', emoji: '👨‍✈️' },
+  { name: { en: 'Mail Carrier', ms: 'Posmen', zh: '邮递员' }, correctCircle: 'yellow', emoji: '📬' },
   
-  { name: 'Teacher', correctCircle: 'orange', emoji: '👨‍🏫' },
-  { name: 'Doctor', correctCircle: 'orange', emoji: '👨‍⚕️' },
-  { name: 'Police Officer', correctCircle: 'orange', emoji: '👮' },
-  { name: 'Firefighter', correctCircle: 'orange', emoji: '👨‍🚒' },
-  { name: 'Dentist', correctCircle: 'orange', emoji: '🦷' },
-  { name: 'Nurse', correctCircle: 'orange', emoji: '👩‍⚕️' },
-  { name: 'Coach', correctCircle: 'orange', emoji: '⚽' },
+  { name: { en: 'Teacher', ms: 'Guru', zh: '老师' }, correctCircle: 'orange', emoji: '👨‍🏫' },
+  { name: { en: 'Doctor', ms: 'Doktor', zh: '医生' }, correctCircle: 'orange', emoji: '👨‍⚕️' },
+  { name: { en: 'Police Officer', ms: 'Pegawai Polis', zh: '警察' }, correctCircle: 'orange', emoji: '👮' },
+  { name: { en: 'Firefighter', ms: 'Anggota Bomba', zh: '消防员' }, correctCircle: 'orange', emoji: '👨‍🚒' },
+  { name: { en: 'Dentist', ms: 'Doktor Gigi', zh: '牙医' }, correctCircle: 'orange', emoji: '🦷' },
+  { name: { en: 'Nurse', ms: 'Jururawat', zh: '护士' }, correctCircle: 'orange', emoji: '👩‍⚕️' },
+  { name: { en: 'Coach', ms: 'Jurulatih', zh: '教练' }, correctCircle: 'orange', emoji: '⚽' },
   
-  { name: 'Stranger', correctCircle: 'red', emoji: '🧔' },
-  { name: 'Person at Park', correctCircle: 'red', emoji: '🧑' },
-  { name: 'Unknown Person', correctCircle: 'red', emoji: '🕴️' },
-  { name: 'Online Stranger', correctCircle: 'red', emoji: '💻' },
+  { name: { en: 'Stranger', ms: 'Orang Asing', zh: '陌生人' }, correctCircle: 'red', emoji: '🧔' },
+  { name: { en: 'Person at Park', ms: 'Orang di Taman', zh: '公园里的人' }, correctCircle: 'red', emoji: '🧑' },
+  { name: { en: 'Unknown Person', ms: 'Orang Tidak Dikenali', zh: '不认识的人' }, correctCircle: 'red', emoji: '🕴️' },
+  { name: { en: 'Online Stranger', ms: 'Orang Asing Dalam Talian', zh: '网上陌生人' }, correctCircle: 'red', emoji: '💻' },
   
-  { name: 'Pet', correctCircle: 'purple', emoji: '🐕' },
+  { name: { en: 'Pet', ms: 'Haiwan Peliharaan', zh: '宠物' }, correctCircle: 'purple', emoji: '🐕' },
 ];
 
-const circles = [
+interface Circle {
+  id: string;
+  labelKey: string;
+  size: number;
+  color: string;
+  lightColor: string;
+  icon: typeof User;
+  descriptionKey: string;
+}
+
+const circles: Circle[] = [
   { 
     id: 'purple', 
-    label: 'Me', 
+    labelKey: 'circleMe', 
     size: 90, 
     color: '#9333ea', 
     lightColor: '#f3e8ff', 
     icon: User,
-    description: 'Just you!'
+    descriptionKey: 'circleMeDesc'
   },
   { 
     id: 'blue', 
-    label: 'Family', 
+    labelKey: 'circleFamily', 
     size: 170, 
     color: '#2563eb', 
     lightColor: '#dbeafe', 
     icon: Users,
-    description: 'People who live with you'
+    descriptionKey: 'circleFamilyDesc'
   },
   { 
     id: 'green', 
-    label: 'Friends', 
+    labelKey: 'circleFriends', 
     size: 250, 
     color: '#16a34a', 
     lightColor: '#dcfce7', 
     icon: Heart,
-    description: 'People you play with'
+    descriptionKey: 'circleFriendsDesc'
   },
   { 
     id: 'yellow', 
-    label: 'Acquaintances', 
+    labelKey: 'circleAcquaintances', 
     size: 330, 
     color: '#ca8a04', 
     lightColor: '#fef9c3', 
     icon: Handshake,
-    description: 'People you know a little'
+    descriptionKey: 'circleAcquaintancesDesc'
   },
   { 
     id: 'orange', 
-    label: 'Helpers', 
+    labelKey: 'circleHelpers', 
     size: 410, 
     color: '#ea580c', 
     lightColor: '#ffedd5', 
     icon: Shield,
-    description: 'People who help us'
+    descriptionKey: 'circleHelpersDesc'
   },
   { 
     id: 'red', 
-    label: 'Strangers', 
+    labelKey: 'circleStrangers', 
     size: 490, 
     color: '#dc2626', 
     lightColor: '#fee2e2', 
     icon: AlertCircle,
-    description: 'People you don\'t know'
+    descriptionKey: 'circleStrangersDesc'
   },
 ];
 
 type GameState = 'setup' | 'playing' | 'feedback' | 'complete';
 
 export function CircleSorter({ onBack }: CircleSorterProps) {
+  const { language } = useLanguage();
+  const t = useTranslation();
   const [gameState, setGameState] = useState<GameState>('setup');
   const [sessionLength, setSessionLength] = useState<number>(10);
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
@@ -120,6 +134,10 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
   const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   // color guide legend removed — no left/right guides
+
+  // Helper to get circle label/description from translation
+  const getCircleLabel = (circle: Circle) => (t as any)[circle.labelKey] || circle.labelKey;
+  const getCircleDescription = (circle: Circle) => (t as any)[circle.descriptionKey] || circle.descriptionKey;
 
   const startGame = (length: number) => {
     const shuffled = [...characterPool].sort(() => Math.random() - 0.5);
@@ -210,13 +228,13 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
         <div className="max-w-2xl w-full">
           <div className="text-center mb-8">
             <div className="text-8xl mb-6">🎯</div>
-            <h2 className="mb-4 text-purple-700">Relationship Circles</h2>
-            <p className="text-xl text-gray-700 mb-2">Sort people into the correct relationship circle!</p>
-            <p className="text-gray-600">Choose how many people to sort:</p>
+            <h2 className="mb-4 text-purple-700">{t.relationshipCircles}</h2>
+            <p className="text-xl text-gray-700 mb-2">{t.sortPeopleIntoCircles}</p>
+            <p className="text-gray-600">{t.choosePeopleToSort}</p>
           </div>
 
           <div className="bg-white rounded-3xl p-8 shadow-xl mb-8">
-            <h3 className="text-center mb-6">Choose Game Length</h3>
+            <h3 className="text-center mb-6">{t.chooseGameLength}</h3>
             
             <div className="grid grid-cols-3 gap-4 mb-8">
               {[5, 10, 15].map((length) => (
@@ -230,7 +248,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                   }`}
                 >
                   <div className="text-5xl mb-2">{length}</div>
-                  <p className="text-sm text-gray-600">People</p>
+                  <p className="text-sm text-gray-600">{t.people}</p>
                 </button>
               ))}
             </div>
@@ -239,12 +257,12 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
               onClick={() => startGame(sessionLength)}
               className="w-full py-6 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-all hover:scale-105 text-xl"
             >
-              Start Game!
+              {t.startGame}
             </button>
           </div>
 
           <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200">
-            <h4 className="mb-4 text-blue-800 text-xl font-bold">Color Guide - Relationship Circles:</h4>
+            <h4 className="mb-4 text-blue-800 text-xl font-bold">{t.colorGuide}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {circles.map((circle) => {
                 const IconComponent = circle.icon;
@@ -266,9 +284,9 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                           className="w-6 h-6 rounded-full border-2 flex-shrink-0"
                           style={{ backgroundColor: circle.color, borderColor: circle.color }}
                         />
-                        <strong className="text-lg" style={{ color: circle.color }}>{circle.label}</strong>
+                        <strong className="text-lg" style={{ color: circle.color }}>{getCircleLabel(circle)}</strong>
                       </div>
-                      <p className="text-sm text-gray-600">{circle.description}</p>
+                      <p className="text-sm text-gray-600">{getCircleDescription(circle)}</p>
                     </div>
                   </div>
                 );
@@ -292,9 +310,9 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
           <div className="bg-white rounded-3xl p-12 shadow-2xl mb-8">
             <div className="text-9xl mb-8">🎉</div>
             <h2 className="mb-4 text-purple-700" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-              Great Job!
+              {t.greatJob}
             </h2>
-            <p className="text-3xl mb-6">You sorted</p>
+            <p className="text-3xl mb-6">{t.youSorted}</p>
             <p className="text-6xl mb-8">
               <span className="text-purple-600">{score}</span>
               <span className="text-gray-400"> / </span>
@@ -316,10 +334,10 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
 
             <p className="text-xl text-gray-600" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
               {percentage >= 90
-                ? 'You did it! Perfect sorting! 🌟'
+                ? t.youDidItPerfect
                 : percentage >= 70
-                ? 'Awesome job! You\'re learning! 👍'
-                : 'Good practice! Keep going! 💪'}
+                ? t.awesomeJobLearning
+                : t.goodPracticeKeepGoing}
             </p>
           </div>
 
@@ -330,7 +348,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
               style={{ fontFamily: 'Comic Sans MS, cursive' }}
             >
               <RotateCcw className="w-7 h-7" />
-              Play Again
+              {t.playAgain}
             </button>
             <button
               onClick={onBack}
@@ -338,7 +356,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
               style={{ fontFamily: 'Comic Sans MS, cursive' }}
             >
               <Home className="w-7 h-7" />
-              Back to Menu
+              {t.backToMenu}
             </button>
           </div>
         </div>
@@ -366,18 +384,18 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
             </div>
             
             <h3 className={`mb-6 ${isCorrect ? 'text-green-700' : 'text-orange-700'}`}>
-              {isCorrect ? 'Perfect!' : 'Not Quite!'}
+              {isCorrect ? t.perfect : t.notQuite}
             </h3>
 
             <div className="bg-white rounded-2xl p-6 mb-6">
               <div className="flex justify-center mb-4">
                 {(() => {
-                  const imageSrc = getCharacterImage(currentCharacter.name, currentCharacter.emoji);
-                  if (imageSrc && (currentCharacter.name === 'Mom' || currentCharacter.name === 'Dad')) {
+                  const imageSrc = getCharacterImage(currentCharacter.name.en, currentCharacter.emoji);
+                  if (imageSrc && (currentCharacter.name.en === 'Mom' || currentCharacter.name.en === 'Dad')) {
                     return (
                       <img
                         src={imageSrc}
-                        alt={currentCharacter.name}
+                        alt={currentCharacter.name[language]}
                         className="w-24 h-24 rounded-full object-cover border-4 shadow-lg"
                         style={{ borderColor: isCorrect ? '#16a34a' : '#ea580c' }}
                         onError={(e) => {
@@ -397,12 +415,12 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                   }
                 })()}
               </div>
-              <p className="text-2xl mb-4">{currentCharacter.name}</p>
+              <p className="text-2xl mb-4">{currentCharacter.name[language]}</p>
               
               {!isCorrect && selectedCircle && (
                 <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-xl">
                   <p className="text-red-700">
-                    You chose: <strong>{selectedCircle.label}</strong>
+                    {t.youChoseCircle} <strong>{getCircleLabel(selectedCircle)}</strong>
                   </p>
                 </div>
               )}
@@ -416,7 +434,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                   }}
                 >
                   <p className="mb-2">
-                    {isCorrect ? 'Yes!' : 'Correct answer:'} <strong>{currentCharacter.name}</strong> belongs in
+                    {isCorrect ? t.yesCorrect : t.correctAnswer} <strong>{currentCharacter.name[language]}</strong> {t.belongsIn}
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     {(() => {
@@ -425,20 +443,20 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                         <>
                           <IconComponent className="w-6 h-6" style={{ color: correctCircle.color }} />
                           <span className="text-2xl" style={{ color: correctCircle.color }}>
-                            {correctCircle.label}
+                            {getCircleLabel(correctCircle)}
                           </span>
                         </>
                       );
                     })()}
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">{correctCircle.description}</p>
+                  <p className="text-sm text-gray-600 mt-2">{getCircleDescription(correctCircle)}</p>
                 </div>
               )}
             </div>
 
             {!isCorrect && (
               <p className="text-orange-600 mb-6">
-                That's okay! Learning takes practice. 💪
+                {t.learningTakesPractice}
               </p>
             )}
 
@@ -450,7 +468,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                   : 'bg-orange-500 hover:bg-orange-600'
               }`}
             >
-              {currentIndex < selectedCharacters.length - 1 ? 'Next Person →' : 'See Results! 🎉'}
+              {currentIndex < selectedCharacters.length - 1 ? t.nextPerson : t.seeResults}
             </button>
           </div>
         </div>
@@ -472,7 +490,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
 
         <div className="bg-white rounded-full px-6 py-3 shadow-lg">
           <span className="text-lg">
-            Person <span className="text-purple-600">{currentIndex + 1}</span> / {sessionLength}
+            {t.person} <span className="text-purple-600">{currentIndex + 1}</span> / {sessionLength}
           </span>
         </div>
 
@@ -510,8 +528,8 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
             <Volume2 className="w-5 h-5" style={{ color: waitingForCircle ? '#16a34a' : '#2563eb' }} />
             <p style={{ color: waitingForCircle ? '#16a34a' : '#2563eb' }}>
               {waitingForCircle 
-                ? '👇 Tap the correct circle below!' 
-                : '👇 Tap "Choose Circle" when ready!'}
+                ? `👇 ${t.tapCorrectCircle}` 
+                : `👇 ${t.tapChooseCircle}`}
             </p>
           </div>
         </div>
@@ -521,15 +539,15 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
       <div className="max-w-md mx-auto mb-8">
         <div className="bg-white rounded-3xl p-8 shadow-xl border-4 border-purple-200">
           <div className="text-center mb-6">
-            <p className="text-gray-600 mb-2">Who is this?</p>
+            <p className="text-gray-600 mb-2">{t.whoIsThis}</p>
             <div className="flex justify-center mb-4">
               {(() => {
-                const imageSrc = getCharacterImage(currentCharacter.name, currentCharacter.emoji);
-                if (imageSrc && (currentCharacter.name === 'Mom' || currentCharacter.name === 'Dad')) {
+                const imageSrc = getCharacterImage(currentCharacter.name.en, currentCharacter.emoji);
+                if (imageSrc && (currentCharacter.name.en === 'Mom' || currentCharacter.name.en === 'Dad')) {
                   return (
                     <img
                       src={imageSrc}
-                      alt={currentCharacter.name}
+                      alt={currentCharacter.name[language]}
                       className="w-32 h-32 rounded-full object-cover border-4 border-purple-300 shadow-lg"
                       onError={(e) => {
                         // Fallback to emoji if image fails
@@ -550,7 +568,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                 }
               })()}
             </div>
-            <h3 className="text-purple-700">{currentCharacter.name}</h3>
+            <h3 className="text-purple-700">{currentCharacter.name[language]}</h3>
           </div>
 
           <button
@@ -565,10 +583,10 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
             {waitingForCircle ? (
               <span className="flex items-center justify-center gap-2">
                 <Check className="w-6 h-6" />
-                Now tap a circle!
+                {t.nowTapCircle}
               </span>
             ) : (
-              'Choose Circle'
+              t.chooseCircle
             )}
           </button>
         </div>
@@ -617,15 +635,15 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
                     ? `0 6px 18px ${circle.color}40, 0 6px 12px rgba(0,0,0,0.08)`
                     : '0 2px 8px rgba(0,0,0,0.1)',
                 }}
-                aria-label={circle.label}
+                aria-label={getCircleLabel(circle)}
                 >
                 {/* inner icon or label */}
                 <div className="flex flex-col items-center justify-center gap-2 px-2">
                   <div style={{ width: Math.round(size * 0.45), height: Math.round(size * 0.45), borderRadius: '50%', backgroundColor: circle.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {(() => { const Icon = circle.icon; return <Icon className="w-8 h-8 text-white" /> })()}
                   </div>
-                  <div className="text-base font-semibold text-center" style={{ color: circle.color }}>{circle.label}</div>
-                  <div className="text-sm text-gray-600 text-center max-w-[220px] leading-tight">{circle.description}</div>
+                  <div className="text-base font-semibold text-center" style={{ color: circle.color }}>{getCircleLabel(circle)}</div>
+                  <div className="text-sm text-gray-600 text-center max-w-[220px] leading-tight">{getCircleDescription(circle)}</div>
                 </div>
               </button>
             );

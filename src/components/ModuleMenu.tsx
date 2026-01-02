@@ -1,4 +1,5 @@
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from '../utils/translations'; // Import the hook
 
 interface Game {
   id: string;
@@ -17,6 +18,8 @@ interface ModuleMenuProps {
 }
 
 export function ModuleMenu({ moduleNumber, title, color, games, onNavigate, onBack }: ModuleMenuProps) {
+  const t = useTranslation(); // Use the hook
+
   const colorClasses = {
     purple: {
       bg: 'from-purple-100 to-pink-100',
@@ -55,8 +58,9 @@ export function ModuleMenu({ moduleNumber, title, color, games, onNavigate, onBa
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <div className={`inline-block px-8 py-3 bg-white rounded-full shadow-lg mb-6 border-4 ${colors.border}`}>
+            {/* Replaced hardcoded "Module" with t.moduleLabel */}
             <span className={`text-2xl ${colors.text}`} style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-              Module {moduleNumber}
+              {t.moduleLabel} {moduleNumber}
             </span>
           </div>
           <h2 className="mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>{title}</h2>
