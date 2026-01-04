@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Lock, Share2, Star, Home, RotateCcw, Check, X, Volume2, Shield, AlertTriangle, PlayCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslation } from '../utils/translations';
+import { playSound } from '../utils/sounds';
 
 interface InfoVaultProps {
   onBack: () => void;
@@ -346,34 +347,7 @@ export function InfoVault({ onBack }: InfoVaultProps) {
     }
   };
 
-  const playSound = (type: 'correct' | 'incorrect') => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      if (type === 'correct') {
-        oscillator.frequency.value = 523.25;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      } else {
-        oscillator.frequency.value = 200;
-        oscillator.type = 'triangle';
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-        oscillator.stop(audioContext.currentTime + 0.4);
-      }
-      
-      oscillator.start(audioContext.currentTime);
-    } catch (e) {
-      console.log('Audio not supported');
-    }
-  };
+
 
   // Setup Screen
   if (gameState === 'setup') {

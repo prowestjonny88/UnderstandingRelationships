@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Users, RotateCcw, Star, PlayCircle, Check, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslation } from '../utils/translations';
+import { playSound } from '../utils/sounds';
 
 interface ScenarioQuizProps {
   onBack: () => void;
@@ -262,34 +263,7 @@ export function ScenarioQuiz({ onBack }: ScenarioQuizProps) {
     }
   };
 
-  const playSound = (type: 'correct' | 'incorrect') => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      if (type === 'correct') {
-        oscillator.frequency.value = 523.25;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-        oscillator.stop(audioContext.currentTime + 0.2);
-      } else {
-        oscillator.frequency.value = 200;
-        oscillator.type = 'triangle';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      }
-      
-      oscillator.start(audioContext.currentTime);
-    } catch (e) {
-      console.log('Audio not supported');
-    }
-  };
+
 
   const getCircleColor = (circleType: string) => {
     const colors: Record<string, string> = {
@@ -366,7 +340,7 @@ export function ScenarioQuiz({ onBack }: ScenarioQuizProps) {
 
         <div className="max-w-4xl w-full text-center">
             <h2 className="text-4xl font-bold text-green-700 mb-8">{t.letsLearnFirst}</h2>
-            <p className="text-xl text-gray-600 mb-8">{t.practiceStayingSafe}</p>
+            <p className="text-xl text-gray-600 mb-8">{t.learnAboutScenarios}</p>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Safe Choices */}

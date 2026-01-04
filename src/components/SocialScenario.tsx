@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Users, RotateCcw, Star } from 'lucide-react';
+import { playSound } from '../utils/sounds';
 
 interface SocialScenarioProps {
   onBack: () => void;
@@ -71,9 +72,7 @@ export function SocialScenario({ onBack }: SocialScenarioProps) {
     }
   };
 
-  const playSound = (type: 'correct' | 'incorrect') => {
-    console.log(`Playing ${type} sound`);
-  };
+
 
   const getCircleColor = (circleType: string) => {
     const colors: Record<string, string> = {

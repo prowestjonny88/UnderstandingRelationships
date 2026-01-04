@@ -4,6 +4,7 @@ import { Confetti } from './Confetti';
 import { getCharacterImage } from '../utils/imageUtils';
 import { useLanguage, Language } from '../context/LanguageContext';
 import { useTranslation } from '../utils/translations';
+import { playSound } from '../utils/sounds';
 
 interface CircleSorterProps {
   onBack: () => void;
@@ -186,34 +187,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
     }
   };
 
-  const playSound = (type: 'correct' | 'incorrect') => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      if (type === 'correct') {
-        oscillator.frequency.value = 523.25;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      } else {
-        oscillator.frequency.value = 200;
-        oscillator.type = 'triangle';
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-        oscillator.stop(audioContext.currentTime + 0.4);
-      }
-      
-      oscillator.start(audioContext.currentTime);
-    } catch (e) {
-      console.log('Audio not supported');
-    }
-  };
+
 
   // Intro / Learning Screen
   if (gameState === 'intro') {
@@ -334,7 +308,7 @@ export function CircleSorter({ onBack }: CircleSorterProps) {
 
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => setGameState('setup')}
+              onClick={() => setGameState('intro')}
               className="px-10 py-6 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all hover:scale-105 flex items-center gap-3 text-xl shadow-xl border-4 border-green-600"
               style={{ fontFamily: 'Comic Sans MS, cursive' }}
             >

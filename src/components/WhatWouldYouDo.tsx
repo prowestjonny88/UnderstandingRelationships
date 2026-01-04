@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Star, Home, RotateCcw, Volume2, MessageSquare, Check, PlayCircle, X } from 'lucide-react';
 import { useLanguage, Language } from '../context/LanguageContext';
 import { useTranslation } from '../utils/translations';
+import { playSound } from '../utils/sounds';
 
 interface WhatWouldYouDoProps {
   onBack: () => void;
@@ -23,7 +24,7 @@ interface Scenario {
   context: Record<Language, string>;
   choices: Choice[];
   explanation: Record<Language, string>;
-  category: 'boundaries' | 'assertiveness' | 'game-rules' | 'stranger-safety' | 'asking-permission';
+  category: 'boundaries' | 'assertiveness' | 'game-rules' | 'stranger-safety' | 'asking-permission' | 'conflict-resolution';
 }
 
 const scenarioPool: Scenario[] = [
@@ -745,34 +746,7 @@ export function WhatWouldYouDo({ onBack }: WhatWouldYouDoProps) {
     }
   };
 
-  const playSound = (type: 'correct' | 'incorrect') => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      if (type === 'correct') {
-        oscillator.frequency.value = 523.25;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.stop(audioContext.currentTime + 0.3);
-      } else {
-        oscillator.frequency.value = 200;
-        oscillator.type = 'triangle';
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-        oscillator.stop(audioContext.currentTime + 0.4);
-      }
-      
-      oscillator.start(audioContext.currentTime);
-    } catch (e) {
-      console.log('Audio not supported');
-    }
-  };
+
 
   // Setup Screen
   if (gameState === 'setup') {
@@ -1028,7 +1002,7 @@ export function WhatWouldYouDo({ onBack }: WhatWouldYouDoProps) {
             <div className="bg-orange-50 border-4 border-orange-300 rounded-2xl p-6 mb-4 relative">
               <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full border-2 border-orange-300">
                 <MessageSquare className="w-5 h-5 inline text-orange-600 mr-2" />
-                <span className="text-sm">{t.situation}</span>
+                <span className="text-sm">{t.situationLabel}</span>
               </div>
               <h3 className="text-orange-700 mb-3 mt-2">{currentScenario.situation[language]}</h3>
               <p className="text-gray-700">{currentScenario.context[language]}</p>
