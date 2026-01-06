@@ -19,32 +19,13 @@ interface GuidedPointerProps {
   isVisible?: boolean;
 }
 
-// Cute animated helper characters
-const helperCharacters = {
-  bear: '🧸',
-  star: '⭐',
-  bunny: '🐰',
-  owl: '🦉'
-};
-
 export function GuidedPointer({ 
   target, 
-  onTargetClick,
   isVisible = true,
 }: GuidedPointerProps) {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isShowing, setIsShowing] = useState(false);
   const [elementRect, setElementRect] = useState<DOMRect | null>(null);
-  const [animationPhase, setAnimationPhase] = useState(0);
-
-  // Cycle through animation phases for more dynamic effect
-  useEffect(() => {
-    if (!isShowing) return;
-    const interval = setInterval(() => {
-      setAnimationPhase(prev => (prev + 1) % 4);
-    }, 800);
-    return () => clearInterval(interval);
-  }, [isShowing]);
 
   // Find and track target element position
   const updatePosition = useCallback(() => {
@@ -115,24 +96,6 @@ export function GuidedPointer({
   }
 
   const pulseColor = target.pulseColor || 'rgba(255, 193, 7, 0.8)';
-  const character = helperCharacters[target.character || 'bear'];
-
-  // Calculate message bubble position
-  const getMessagePosition = () => {
-    const pos = target.messagePosition || 'bottom';
-    switch (pos) {
-      case 'top':
-        return 'bottom-full mb-3 left-1/2 -translate-x-1/2';
-      case 'bottom':
-        return 'top-full mt-3 left-1/2 -translate-x-1/2';
-      case 'left':
-        return 'right-full mr-3 top-1/2 -translate-y-1/2';
-      case 'right':
-        return 'left-full ml-3 top-1/2 -translate-y-1/2';
-      default:
-        return 'top-full mt-3 left-1/2 -translate-x-1/2';
-    }
-  };
 
   return (
     <>
@@ -258,74 +221,18 @@ export function GuidedPointer({
           </>
         )}
 
-        {/* Animated pointing hand with helper character */}
+        {/* Animated pointing hand - simple version without character or message */}
         <div
           className="absolute pointer-events-none"
           style={{
-            left: position.x + 30,
-            top: position.y + 30,
+            left: position.x + 20,
+            top: position.y + 20,
           }}
         >
-          {/* Helper character with speech bubble */}
-          <div className="relative">
-            {/* Character */}
-            <div className="float-char text-5xl drop-shadow-lg">
-              {character}
-            </div>
-            
-            {/* Pointing hand coming from character */}
-            <div 
-              className="absolute -left-10 top-2 pointer-hand origin-bottom-right"
-              style={{ fontSize: '2.5rem' }}
-            >
-              👆
-            </div>
-
-            {/* Message bubble */}
-            {target.message && (
-              <div
-                className={`absolute ${getMessagePosition()} message-bubble`}
-                style={{ 
-                  minWidth: '140px',
-                  maxWidth: '200px',
-                }}
-              >
-                {/* Bubble with tail */}
-                <div className="relative bg-white rounded-2xl px-4 py-3 shadow-xl border-3 border-amber-400"
-                  style={{
-                    background: 'linear-gradient(135deg, #fff9e6 0%, #ffffff 50%, #fff5d6 100%)',
-                    boxShadow: '0 8px 25px rgba(251, 191, 36, 0.3), 0 4px 10px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  {/* Decorative stars */}
-                  <span className="absolute -top-2 -left-2 text-lg">⭐</span>
-                  <span className="absolute -top-2 -right-2 text-sm">✨</span>
-                  
-                  <p className="text-base font-bold text-center bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent"
-                    style={{ fontFamily: 'Comic Sans MS, cursive' }}
-                  >
-                    {target.message}
-                  </p>
-                  
-                  {target.showNextArrow && (
-                    <div className="flex justify-center mt-1">
-                      <span className="text-xl animate-bounce">👉</span>
-                    </div>
-                  )}
-                  
-                  {/* Bubble tail */}
-                  <div 
-                    className="absolute w-4 h-4 bg-white border-l-3 border-b-3 border-amber-400 transform rotate-45"
-                    style={{
-                      bottom: '-8px',
-                      left: '50%',
-                      marginLeft: '-8px',
-                      background: 'linear-gradient(135deg, #fff9e6, #ffffff)',
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+          <div 
+            className="pointer-hand origin-bottom-right text-4xl drop-shadow-lg"
+          >
+            👆
           </div>
         </div>
 
