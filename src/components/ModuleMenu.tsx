@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from '../utils/translations';
 import { useGuide } from '../context/GuideContext';
@@ -21,28 +21,39 @@ interface ModuleMenuProps {
 
 export function ModuleMenu({ moduleNumber, title, color, games, onNavigate, onBack }: ModuleMenuProps) {
   const t = useTranslation();
-  const { showPointer, hidePointer, isPointerEnabled } = useGuide();
-  const [hasShownPointer, setHasShownPointer] = useState(false);
+  const { showPointer, hidePointer, isPointerEnabled, isGameComplete } = useGuide();
 
-  // Show pointer to first game when entering module
+  // Show pointer to the next uncompleted game when entering module
   useEffect(() => {
-    if (!isPointerEnabled || hasShownPointer || games.length === 0) return;
+    if (!isPointerEnabled || games.length === 0) return;
     
-    const firstGame = games[0];
+    // Find the first uncompleted game, or if all completed, show the second game (variety)
+    let targetGame = games.find(game => !isGameComplete(game.id));
+    
+    // If all games are completed, point to the one they played less recently (assume second one)
+    if (!targetGame && games.length > 1) {
+      // Check which was completed last and suggest the other
+      const lastPlayedGame = localStorage.getItem('lastPlayedGame');
+      if (lastPlayedGame === games[0].id) {
+        targetGame = games[1];
+      } else {
+        targetGame = games[0];
+      }
+    } else if (!targetGame) {
+      targetGame = games[0];
+    }
+    
     const timer = setTimeout(() => {
       showPointer({
-        id: 'first-game',
-        selector: `[data-guide="${firstGame.id}"]`,
-        message: t.tapToPlay || 'Tap to play! 🎮',
+        id: 'next-game',
+        selector: `[data-guide="${targetGame!.id}"]`,
         messagePosition: 'top',
         pulseColor: 'rgba(59, 130, 246, 0.8)',
-        character: 'star'
       });
-      setHasShownPointer(true);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [isPointerEnabled, hasShownPointer, games, showPointer, t]);
+  }, [isPointerEnabled, games, showPointer, isGameComplete]);
 
   const colorClasses = {
     purple: {

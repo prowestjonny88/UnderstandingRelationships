@@ -170,43 +170,13 @@ export function useGuide() {
 
 // Helper hook for game completion with navigation pointer
 export function useGameCompletion(gameId: string) {
-  const { markGameComplete, getNextGame, showPointer, isPointerEnabled } = useGuide();
-  const language = localStorage.getItem('selectedLanguage') || 'en';
+  const { markGameComplete } = useGuide();
 
   const completeGame = useCallback(() => {
     markGameComplete(gameId);
-    const nextGame = getNextGame(gameId);
-    
-    if (nextGame && isPointerEnabled && nextGame !== 'complete') {
-      // Determine the selector based on what the next destination is
-      let selector = '';
-      let message = NEXT_GAME_MESSAGES[language as keyof typeof NEXT_GAME_MESSAGES]?.[nextGame] || 
-                    NEXT_GAME_MESSAGES['en'][nextGame] || 
-                    'Great job! Continue! 🎉';
-      
-      if (nextGame.startsWith('module')) {
-        // Point to back button to go back to module selection
-        selector = '[data-guide="back"]';
-        message = 'Go back to try more games! ⬅️';
-      } else {
-        // Will show pointer to specific game in module menu
-        selector = `[data-guide="${nextGame}"]`;
-      }
-
-      // Show pointer after a short delay to let the completion animation play
-      setTimeout(() => {
-        showPointer({
-          id: `complete-${gameId}`,
-          selector,
-          message,
-          messagePosition: 'bottom',
-          pulseColor: 'rgba(34, 197, 94, 0.6)',
-          showNextArrow: true,
-          delay: 500
-        });
-      }, 1500);
-    }
-  }, [gameId, markGameComplete, getNextGame, showPointer, isPointerEnabled, language]);
+    // Save which game was just played so we can point to the other one next time
+    localStorage.setItem('lastPlayedGame', gameId);
+  }, [gameId, markGameComplete]);
 
   return { completeGame };
 }
